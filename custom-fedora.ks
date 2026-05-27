@@ -7,7 +7,6 @@ selinux --enforcing
 firewall --enabled --service=ssh
 
 # --- Enable Initial Setup UI ---
-# This forces the OS to prompt you for a username and password on the very first boot
 firstboot --enable
 services --enabled=network,sshd,gdm,initial-setup
 
@@ -38,6 +37,14 @@ python3-pip
 # Required to display the user setup screen on first boot
 initial-setup
 initial-setup-gui
+
+# --- CRITICAL LIVE OS BOOT PACKAGES ---
+kernel
+dracut-live
+grub2-efi-x64
+grub2-pc
+syslinux
+shim-x64
 
 -thunderbird
 -evince
