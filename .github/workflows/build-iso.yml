@@ -2,8 +2,8 @@ name: Build Custom Fedora ISO
 
 on:
   push:
-    branches: [ "main" ] # Runs automatically when you push updates
-  workflow_dispatch:     # Lets you trigger the build manually via GitHub website
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,16 +12,29 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build Live ISO via Livemedia Creator
-        uses: jasonn3/build-fedora-iso-action@v1
-        with:
-          kickstart: custom-fedora.ks
-          filename: custom-fedora-dev-remix.iso
+      - name: Build Live ISO using Fedora Container
+        run: |
+          # Create an empty directory to catch the finished ISO
+          mkdir -p output/
+
+          # Run an official Fedora container as 'root' with full access privileges to build the filesystem
+          docker run --privileged --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -v ${{ github.workspace }}/output:/output \
+            registry.fedoraproject.org/fedora:40 \
+            /bin/bash -c "
+              dnf install -y lorax rpm pykickstart &&
+              livemedia-creator --ks /workspace/custom-fedora.ks \
+                                --make-iso \
+                                --no-virt \
+                                --volid 'Fedora-Custom-Dev' \
+                                --outputdir /output \
+                                --logfile /output/livemedia-creator.log
+            "
 
       - name: Upload Bootable Operating System
         uses: actions/upload-artifact@v4
         with:
           name: fedora-dev-iso
-          path: ./custom-fedora-dev-remix.iso
-          retention-days: 5 # Saves the file on GitHub for 5 days
-
+          path: ./output/*.iso
+          retention-days: 5
