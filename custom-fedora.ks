@@ -6,8 +6,9 @@ authselect --enableshadow --passalgo=sha512
 selinux --enforcing
 firewall --enabled --service=ssh
 
-# --- MANDATORY INSTALLATION SOURCE ---
+# --- MANDATORY INSTALLATION SOURCE & NETWORK ---
 url --url="https://fedoraproject.org"
+network --bootproto=dhcp
 
 # --- Enable Initial Setup UI ---
 firstboot --enable
