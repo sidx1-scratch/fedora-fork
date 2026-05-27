@@ -14,13 +14,9 @@ jobs:
 
       - name: Build Live ISO using Fedora Container
         run: |
-          # Create an empty directory to catch the finished ISO
-          mkdir -p output/
-
           # Run the official Fedora container with appropriate privileges
           docker run --privileged --rm \
             -v ${{ github.workspace }}:/workspace \
-            -v ${{ github.workspace }}/output:/output \
             registry.fedoraproject.org/fedora:40 \
             /bin/bash -c "
               dnf install -y lorax rpm pykickstart anaconda-tui &&
@@ -29,8 +25,8 @@ jobs:
                                 --no-virt \
                                 --iso-name 'custom-fedora-dev-remix.iso' \
                                 --location 'https://fedoraproject.org' \
-                                --resultdir /output \
-                                --logfile /output/livemedia-creator.log
+                                --resultdir /workspace/output \
+                                --logfile /workspace/livemedia-creator.log
             "
 
       - name: Upload Bootable Operating System
